@@ -76,7 +76,7 @@ class MultipleField extends \yii\widgets\InputWidget
         }
 
         $tag = ArrayHelper::remove($options, 'tag', 'div');
-        Html::addCssClass($options, 'iterable-input-block');
+        Html::addCssClass($options, 'multiple-field');
 
         return Html::tag($tag, $result, $options);
     }
@@ -102,7 +102,7 @@ class MultipleField extends \yii\widgets\InputWidget
         }
 
         $tag = ArrayHelper::remove($options, 'tag', 'div');
-        Html::addCssClass($options, 'iterable-input-block-item');
+        Html::addCssClass($options, 'multiple-field-item');
 
         return Html::tag($tag, $result, $options);
     }

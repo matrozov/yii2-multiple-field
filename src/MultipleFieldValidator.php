@@ -6,6 +6,7 @@ use Yii;
 use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\helpers\Html;
 use yii\validators\Validator;
 
 /**
@@ -57,7 +58,7 @@ class MultipleFieldValidator extends Validator
                 $object = Yii::createObject(['class' => $this->model]);
 
                 if (!$object->load($data)) {
-                    $this->addError($model, $attribute . '[' . $key . ']', $this->message);
+                    $this->addError($model, $attribute, $this->message);
                     return;
                 }
 
@@ -71,10 +72,15 @@ class MultipleFieldValidator extends Validator
                 $errors = $object->getFirstErrors();
 
                 foreach ($errors as $field => $error) {
-                    $model->addError($attribute . '[' . $key . ']', $error);
+                    if (!preg_match(Html::$attributeRegex, $field, $matches)) {
+                        $model->addError($attribute . '[' . $key . '][' . $field . ']', $error);
+                        return;
+                    }
+
+                    $model->addError($attribute . '[' . $key . '][' . $matches[2] . ']' . $matches[3], $error);
                 }
 
-                return;
+                continue;
             }
 
             $model->$attribute[$key] = $object;
