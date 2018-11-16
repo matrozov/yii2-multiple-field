@@ -38,10 +38,10 @@
                     var $item = null;
 
                     if (index !== undefined) {
-                        $item = self.$wrapper.find('.multiple-Field-item:eq(' + index + ')');
+                        $item = self.$wrapper.find('.multiple-field-item:eq(' + index + ')');
                     }
                     else {
-                        $item = self.$wrapper.find('.multiple-Field-item').last();
+                        $item = self.$wrapper.find('.multiple-field-item').last();
                     }
 
                     self.remove($item);
@@ -82,7 +82,7 @@
                 self.$wrapper.on('click', '.js-item-remove', function(event) {
                     event.stopPropagation();
 
-                    var $item = $(this).closest('.multiple-Field-item');
+                    var $item = $(this).closest('.multiple-field-item');
 
                     self.remove($item);
 
@@ -139,7 +139,7 @@
             },
 
             count: function() {
-                return self.$wrapper.find('.multiple-Field-item').length;
+                return self.$wrapper.find('.multiple-field-item').length;
             }
         };
 
