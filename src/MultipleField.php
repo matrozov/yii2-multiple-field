@@ -92,7 +92,7 @@ class MultipleField extends \yii\widgets\InputWidget
         $this->_key = $key;
 
         if (is_callable($this->item)) {
-            $result = call_user_func($this->item, $this, $key);
+            $result = call_user_func_array($this->item, [$this, $key, &$options]);
         }
         else {
             $result = $this->view->render($this->item, [
