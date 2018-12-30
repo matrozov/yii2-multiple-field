@@ -3,23 +3,19 @@
 namespace matrozov\yii2multipleField;
 
 use Yii;
-use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
 use yii\validators\Validator;
 
 /**
- * Class MultipleFieldValidator
+ * Class MultipleFieldModelValidator
  * @package matrozov\yii2multipleField
  *
- * @property array $rules
  * @property Model $model
  */
-class MultipleFieldValidator extends Validator
+class MultipleFieldModelValidator extends Validator
 {
-    public $rules;
-
     public $model;
 
     /**
@@ -33,14 +29,14 @@ class MultipleFieldValidator extends Validator
             $this->message = Yii::t('yii', '{attribute} is invalid.');
         }
 
-        if (!$this->rules && !is_array($this->rules) && !$this->model && !($this->model instanceof Model)) {
+        if (!$this->model && !($this->model instanceof Model)) {
             throw new InvalidConfigException('Rules or Model parameter required!');
         }
     }
 
     /**
-     * @param \yii\base\Model $model
-     * @param string          $attribute
+     * @param Model  $model
+     * @param string $attribute
      *
      * @throws InvalidConfigException
      */
@@ -54,21 +50,14 @@ class MultipleFieldValidator extends Validator
         }
 
         foreach ($values as $key => $data) {
-            if ($this->model) {
-                $object = Yii::createObject(['class' => $this->model]);
+            $object = Yii::createObject(['class' => $this->model]);
 
-                if (!$object->load($data)) {
-                    $this->addError($model, $attribute, $this->message);
-                    return;
-                }
-
-                $object->validate();
-            }
-            else {
-                $object = DynamicModel::validateData($data, $this->rules);
+            if (!$object->load($data)) {
+                $this->addError($model, $attribute, $this->message);
+                return;
             }
 
-            if ($object->hasErrors()) {
+            if (!$object->validate() && $object->hasErrors()) {
                 $errors = $object->getFirstErrors();
 
                 foreach ($errors as $field => $error) {
@@ -100,20 +89,13 @@ class MultipleFieldValidator extends Validator
         }
 
         foreach ($values as $key => $data) {
-            if ($this->model) {
-                $object = Yii::createObject(['class' => $this->model]);
+            $object = Yii::createObject(['class' => $this->model]);
 
-                if (!$object->load($data)) {
-                    return [$this->message, []];
-                }
-
-                $object->validate();
-            }
-            else {
-                $object = DynamicModel::validateData($data, $this->rules);
+            if (!$object->load($data)) {
+                return [$this->message, []];
             }
 
-            if ($object->hasErrors()) {
+            if (!$object->validate() && $object->hasErrors()) {
                 $errors = $object->getFirstErrors();
 
                 foreach ($errors as $field => $error) {
