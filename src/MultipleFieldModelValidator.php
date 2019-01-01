@@ -6,7 +6,6 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
-use yii\validators\Validator;
 
 /**
  * Class MultipleFieldModelValidator
@@ -14,7 +13,7 @@ use yii\validators\Validator;
  *
  * @property Model $model
  */
-class MultipleFieldModelValidator extends Validator
+class MultipleFieldModelValidator extends MultipleFieldKeyValidator
 {
     public $model;
 
@@ -25,12 +24,8 @@ class MultipleFieldModelValidator extends Validator
     {
         parent::init();
 
-        if ($this->message === null) {
-            $this->message = Yii::t('yii', '{attribute} is invalid.');
-        }
-
         if (!$this->model && !($this->model instanceof Model)) {
-            throw new InvalidConfigException('Rules or Model parameter required!');
+            throw new InvalidConfigException('"model" parameter required!');
         }
     }
 

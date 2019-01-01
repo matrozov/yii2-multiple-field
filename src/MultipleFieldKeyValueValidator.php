@@ -2,12 +2,10 @@
 
 namespace matrozov\yii2multipleField;
 
-use Yii;
 use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
-use yii\validators\Validator;
 
 /**
  * Class MultipleFieldKeyValueValidator
@@ -15,7 +13,7 @@ use yii\validators\Validator;
  *
  * @property array $rules
  */
-class MultipleFieldKeyValueValidator extends Validator
+class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
 {
     public $rules;
 
@@ -26,12 +24,8 @@ class MultipleFieldKeyValueValidator extends Validator
     {
         parent::init();
 
-        if ($this->message === null) {
-            $this->message = Yii::t('yii', '{attribute} is invalid.');
-        }
-
         if (!$this->rules && !is_array($this->rules)) {
-            throw new InvalidConfigException('Rules or Model parameter required!');
+            throw new InvalidConfigException('"rules" parameter required!');
         }
     }
 
@@ -49,6 +43,8 @@ class MultipleFieldKeyValueValidator extends Validator
             $this->addError($model, $attribute, $this->message);
             return;
         }
+
+        parent::validateAttribute($model, $attribute);
 
         foreach ($values as $key => $data) {
             $object = DynamicModel::validateData($data, $this->rules);
@@ -82,6 +78,12 @@ class MultipleFieldKeyValueValidator extends Validator
     {
         if (!is_array($values) && !($values instanceof \ArrayAccess)) {
             return [$this->message, []];
+        }
+
+        $error = parent::validateValue($values);
+
+        if ($error !== null) {
+            return $error;
         }
 
         foreach ($values as $key => $data) {
