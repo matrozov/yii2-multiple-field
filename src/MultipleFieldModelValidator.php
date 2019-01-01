@@ -55,7 +55,7 @@ class MultipleFieldModelValidator extends Validator
         else {
             $object = Yii::createObject(['class' => $this->model]);
 
-            if (!$object->load($value)) {
+            if (!$object->load($value, '')) {
                 $this->addError($model, $attribute, $this->message);
                 return;
             }
@@ -95,7 +95,7 @@ class MultipleFieldModelValidator extends Validator
         else {
             $object = Yii::createObject(['class' => $this->model]);
 
-            if (!$object->load($value)) {
+            if (!$object->load($value, '')) {
                 return [$this->message, []];
             }
         }

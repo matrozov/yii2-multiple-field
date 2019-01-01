@@ -48,7 +48,7 @@ class MultipleFieldKeyModelValidator extends MultipleFieldKeyValidator
         foreach ($values as $key => $data) {
             $object = Yii::createObject(['class' => $this->model]);
 
-            if (!$object->load($data)) {
+            if (!$object->load($data, '')) {
                 $this->addError($model, $attribute, $this->message);
                 return;
             }
