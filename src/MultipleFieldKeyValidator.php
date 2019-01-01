@@ -6,7 +6,7 @@ use Yii;
 use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
-use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\validators\Validator;
 
 /**
@@ -36,6 +36,25 @@ class MultipleFieldKeyValidator extends Validator
     }
 
     /**
+     * @return array
+     */
+    protected function prepareKeyRules()
+    {
+        $rules = [];
+
+        foreach ($this->keyRules as $rule) {
+            if ($rule instanceof Validator) {
+                $rules[] = $rule;
+            }
+            elseif (is_array($rule) && isset($rule[0])) {
+                $rules[] = ArrayHelper::merge(['key'], $rule);
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
      * @param Model  $model
      * @param string $attribute
      *
@@ -50,22 +69,23 @@ class MultipleFieldKeyValidator extends Validator
             return;
         }
 
-        $keys = array_keys($values);
+        $filtered = [];
 
-        $object = DynamicModel::validateData($keys, $this->keyRules);
+        $rules = $this->prepareKeyRules();
 
-        if ($object->hasErrors()) {
-            $errors = $object->getFirstErrors();
+        foreach ($values as $key => $data) {
+            $object = DynamicModel::validateData(['key' => $key], $rules);
 
-            foreach ($errors as $field => $error) {
-                if (!preg_match(Html::$attributeRegex, $field, $matches)) {
-                    $model->addError($attribute . '[' . $field . ']', $error);
-                    return;
-                }
+            if ($object->hasErrors()) {
+                $error = $object->getFirstError('key');
 
-                $model->addError($attribute . '[' . $matches[2] . ']' . $matches[3], $error);
+                $model->addError($attribute . '[' . $key . ']', $error);
             }
+
+            $filtered[$object['key']] = $data;
         }
+
+        $model->$attribute = $filtered;
     }
 
     /**
@@ -80,16 +100,18 @@ class MultipleFieldKeyValidator extends Validator
             return [$this->message, []];
         }
 
-        $keys = array_keys($values);
+        $rules = $this->prepareKeyRules();
 
-        $object = DynamicModel::validateData($keys, $this->keyRules);
+        foreach ($values as $key => $data) {
+            $object = DynamicModel::validateData(['key' => $key], $rules);
 
-        if ($object->hasErrors()) {
-            $errors = $object->getFirstErrors();
+            if ($object->hasErrors()) {
+                $error = $object->getFirstError('key');
 
-            foreach ($errors as $field => $error) {
                 return [$error, []];
             }
         }
+
+        return null;
     }
 }
