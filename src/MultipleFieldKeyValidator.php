@@ -17,7 +17,9 @@ use yii\validators\Validator;
  */
 abstract class MultipleFieldKeyValidator extends Validator
 {
-    public $keyRules;
+    public $keyRules = [
+        ['integer', 'min' => 0],
+    ];
 
     /**
      * @throws InvalidConfigException
