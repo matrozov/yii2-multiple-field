@@ -2,20 +2,20 @@
 
 namespace matrozov\yii2multipleField;
 
-use yii\base\DynamicModel;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
 
 /**
- * Class MultipleFieldKeyValueValidator
+ * Class MultipleFieldKeyModelValidator
  * @package matrozov\yii2multipleField
  *
- * @property array $rules
+ * @property Model $model
  */
-class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
+class MultipleFieldKeyModelValidator extends MultipleFieldKeyValidator
 {
-    public $rules;
+    public $model;
 
     /**
      * @throws InvalidConfigException
@@ -24,8 +24,8 @@ class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
     {
         parent::init();
 
-        if (!$this->rules && !is_array($this->rules)) {
-            throw new InvalidConfigException('"rules" parameter required!');
+        if (!$this->model && !($this->model instanceof Model)) {
+            throw new InvalidConfigException('"model" parameter required!');
         }
     }
 
@@ -46,9 +46,14 @@ class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
         $values = $model->$attribute;
 
         foreach ($values as $key => $data) {
-            $object = DynamicModel::validateData($data, $this->rules);
+            $object = Yii::createObject(['class' => $this->model]);
 
-            if ($object->hasErrors()) {
+            if (!$object->load($data)) {
+                $this->addError($model, $attribute, $this->message);
+                return;
+            }
+
+            if (!$object->validate() && $object->hasErrors()) {
                 $errors = $object->getFirstErrors();
 
                 foreach ($errors as $field => $error) {
@@ -79,15 +84,15 @@ class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
             return $error;
         }
 
-        foreach ($values as $key => $data) {
-            $object = DynamicModel::validateData($data, $this->rules);
+        $validator = new MultipleFieldModelValidator([
+            'model' => $this->model,
+        ]);
 
-            if ($object->hasErrors()) {
-                $errors = $object->getFirstErrors();
+        foreach ($values as $key => $value) {
+            $error = $validator->validateValue($value);
 
-                foreach ($errors as $field => $error) {
-                    return [$error, []];
-                }
+            if ($error !== null) {
+                return [$this->message, []];
             }
         }
 

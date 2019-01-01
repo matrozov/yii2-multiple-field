@@ -15,7 +15,7 @@ use yii\validators\Validator;
  *
  * @property array $keyRules
  */
-class MultipleFieldKeyValidator extends Validator
+abstract class MultipleFieldKeyValidator extends Validator
 {
     public $keyRules;
 
