@@ -19,7 +19,7 @@ use yii\validators\Validator;
 abstract class KeyValidator extends Validator
 {
     public $keyRules     = [];
-    public $keyIsIndexed = true;
+    public $keyIsIndexed = false;
 
     /**
      * {@inheritdoc}
