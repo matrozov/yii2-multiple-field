@@ -1,6 +1,6 @@
 <?php
 
-namespace matrozov\yii2multipleField;
+namespace matrozov\yii2multipleField\validators;
 
 use Yii;
 use yii\base\DynamicModel;
@@ -10,18 +10,20 @@ use yii\helpers\ArrayHelper;
 use yii\validators\Validator;
 
 /**
- * Class MultipleFieldKeyValidator
+ * Class KeyValidator
  * @package matrozov\yii2multipleField
  *
  * @property array $keyRules
+ * @property bool  $keyIsIndexed
  */
-abstract class MultipleFieldKeyValidator extends Validator
+abstract class KeyValidator extends Validator
 {
-    public $keyRules = [
-        ['integer', 'min' => 0],
-    ];
+    public $keyRules     = [];
+    public $keyIsIndexed = true;
 
     /**
+     * {@inheritdoc}
+     *
      * @throws InvalidConfigException
      */
     public function init()
@@ -71,11 +73,16 @@ abstract class MultipleFieldKeyValidator extends Validator
             return;
         }
 
+        if ($this->keyIsIndexed && !ArrayHelper::isIndexed($values)) {
+            $this->addError($model, $attribute, $this->message);
+            return;
+        }
+
         $filtered = [];
 
         $rules = $this->prepareKeyRules();
 
-        foreach ($values as $key => $data) {
+        foreach ($values as $key => $value) {
             $object = DynamicModel::validateData(['key' => $key], $rules);
 
             if ($object->hasErrors()) {
@@ -84,14 +91,14 @@ abstract class MultipleFieldKeyValidator extends Validator
                 $model->addError($attribute . '[' . $key . ']', $error);
             }
 
-            $filtered[$object['key']] = $data;
+            $filtered[$object['key']] = $value;
         }
 
         $model->$attribute = $filtered;
     }
 
     /**
-     * @param mixed $values
+     * @param array $values
      *
      * @return array|null
      * @throws InvalidConfigException
@@ -99,6 +106,10 @@ abstract class MultipleFieldKeyValidator extends Validator
     public function validateValue($values)
     {
         if (!is_array($values) && !($values instanceof \ArrayAccess)) {
+            return [$this->message, []];
+        }
+
+        if ($this->keyIsIndexed && !ArrayHelper::isIndexed($values)) {
             return [$this->message, []];
         }
 

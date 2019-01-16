@@ -1,6 +1,6 @@
 <?php
 
-namespace matrozov\yii2multipleField;
+namespace matrozov\yii2multipleField\validators;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -8,17 +8,17 @@ use yii\base\Model;
 use yii\helpers\Html;
 
 /**
- * Class MultipleFieldKeyModelValidator
+ * Class KeyModelValidator
  * @package matrozov\yii2multipleField
  *
  * @property Model $model
  */
-class MultipleFieldKeyModelValidator extends MultipleFieldKeyValidator
+class KeyModelValidator extends KeyValidator
 {
     public $model;
 
     /**
-     * @throws InvalidConfigException
+     * {@inheritdoc}
      */
     public function init()
     {
@@ -45,10 +45,10 @@ class MultipleFieldKeyModelValidator extends MultipleFieldKeyValidator
 
         $values = $model->$attribute;
 
-        foreach ($values as $key => $data) {
+        foreach ($values as $key => $value) {
             $object = Yii::createObject(['class' => $this->model]);
 
-            if (!$object->load($data, '')) {
+            if (!$object->load($value, '')) {
                 $this->addError($model, $attribute, $this->message);
                 return;
             }
@@ -73,7 +73,7 @@ class MultipleFieldKeyModelValidator extends MultipleFieldKeyValidator
     }
 
     /**
-     * @param mixed $values
+     * @param array $values
      *
      * @return array|null
      * @throws InvalidConfigException
@@ -84,7 +84,7 @@ class MultipleFieldKeyModelValidator extends MultipleFieldKeyValidator
             return $error;
         }
 
-        $validator = new MultipleFieldModelValidator([
+        $validator = new ModelValidator([
             'model' => $this->model,
         ]);
 
@@ -92,7 +92,7 @@ class MultipleFieldKeyModelValidator extends MultipleFieldKeyValidator
             $error = $validator->validateValue($value);
 
             if ($error !== null) {
-                return [$this->message, []];
+                return $error;
             }
         }
 

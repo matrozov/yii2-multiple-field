@@ -1,6 +1,6 @@
 <?php
 
-namespace matrozov\yii2multipleField;
+namespace matrozov\yii2multipleField\validators;
 
 use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
@@ -8,17 +8,17 @@ use yii\base\Model;
 use yii\helpers\Html;
 
 /**
- * Class MultipleFieldKeyValueValidator
+ * Class KeyArrayValidator
  * @package matrozov\yii2multipleField
  *
  * @property array $rules
  */
-class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
+class KeyArrayValidator extends KeyValidator
 {
     public $rules;
 
     /**
-     * @throws InvalidConfigException
+     * {@inheritdoc}
      */
     public function init()
     {
@@ -45,8 +45,8 @@ class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
 
         $values = $model->$attribute;
 
-        foreach ($values as $key => $data) {
-            $object = DynamicModel::validateData($data, $this->rules);
+        foreach ($values as $key => $value) {
+            $object = DynamicModel::validateData($value, $this->rules);
 
             if ($object->hasErrors()) {
                 $errors = $object->getFirstErrors();
@@ -63,12 +63,12 @@ class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
                 continue;
             }
 
-            $model->$attribute[$key] = $object;
+            $model->$attribute[$key] = $object->getAttributes();
         }
     }
 
     /**
-     * @param mixed $values
+     * @param array $values
      *
      * @return array|null
      * @throws InvalidConfigException
@@ -79,15 +79,15 @@ class MultipleFieldKeyValueValidator extends MultipleFieldKeyValidator
             return $error;
         }
 
-        foreach ($values as $key => $data) {
-            $object = DynamicModel::validateData($data, $this->rules);
+        $validator = new ArrayValidator([
+            'rules' => $this->rules,
+        ]);
 
-            if ($object->hasErrors()) {
-                $errors = $object->getFirstErrors();
+        foreach ($values as $key => $value) {
+            $error = $validator->validateValue($value);
 
-                foreach ($errors as $field => $error) {
-                    return [$error, []];
-                }
+            if ($error !== null) {
+                return $error;
             }
         }
 

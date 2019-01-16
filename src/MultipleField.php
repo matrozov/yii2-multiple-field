@@ -120,7 +120,7 @@ class MultipleField extends \yii\widgets\InputWidget
      *
      * @return \yii\widgets\ActiveField
      */
-    public function field(string $attribute, array $options = [])
+    public function field($attribute, array $options = [])
     {
         $attributeFullName = $this->attribute . '[' . $this->_key . '][' . $attribute . ']';
 
