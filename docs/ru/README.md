@@ -4,5 +4,5 @@
 и отображением ошибок.
 
 * [Установка](installation.md)
-* [Виджет](widget.md)
+* [Конфигурация](configuration.md)
 * [Валидация](validators.md)
