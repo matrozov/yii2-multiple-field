@@ -89,14 +89,14 @@
                     return false;
                 });
 
-                self.$wrapper.data('multipleField', self.public);
+                self.$wrapper.data('multipleField', self);
 
                 var afterInitEvent = $.Event(self.events.afterInit);
                 self.$wrapper.trigger(afterInitEvent);
             },
 
             add: function() {
-                if ((self.options.max !== null) && (self.count() > self.options.max)) {
+                if ((self.options.max !== null) && (self.count() >= self.options.max)) {
                     var maxReachedEvent = $.Event(self.events.maxReached);
 
                     self.$wrapper.trigger(maxReachedEvent);
@@ -144,6 +144,8 @@
         };
 
         if (self.public[method]) {
+            self = $(this).data('multipleField');
+
             return self.public[method].apply(this, Array.prototype.slice.call(arguments, 1));
         }
         else if (typeof method === 'object' || !method) {
