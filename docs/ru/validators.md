@@ -58,7 +58,7 @@
 Конфигурация валидатора выглядит следующим образом:
 
 ```php
-[['my-field'], ModelValidator::class, 'model' => MyFieldModel::class],
+[['my-field'], ModelValidator::class, 'model' => MyFieldModel::class, 'scenario' => MyFieldModel::SCENARIO_MY],
 ```
 
 При этом в указанной модели описаны rules вида:
@@ -185,7 +185,7 @@
 [['my-field'], KeyArrayValidator::class, 'keyRules' => [
     ['integer', 'max' => 100],
     ...
-], 'model' => MyFieldModel::class]]
+], 'model' => MyFieldModel::class, 'scenario' => MyFieldModel::SCENARIO_MY]]
 ```
 
 При этом в указанной модели описаны rules вида:

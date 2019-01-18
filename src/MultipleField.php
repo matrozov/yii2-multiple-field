@@ -3,6 +3,7 @@
 namespace matrozov\yii2multipleField;
 
 use matrozov\yii2multipleField\extend\ActiveField;
+use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -27,10 +28,23 @@ class MultipleField extends \yii\widgets\InputWidget
 
     public $item;
     public $max;
-    public $maxReachedMessage = 'Maximum field reached!';
+    public $maxReachedMessage;
 
     /** @var int $_key */
     protected $_key;
+
+    /**
+     * {@inheritdoc}
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function init()
+    {
+        parent::init();
+
+        if (empty($this->maxReachedMessage)) {
+            $this->maxReachedMessage = Yii::t('app', 'Maximum field reached!');
+        }
+    }
 
     /**
      * @return string

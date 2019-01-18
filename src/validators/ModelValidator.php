@@ -12,11 +12,13 @@ use yii\validators\Validator;
  * Class ModelValidator
  * @package matrozov\yii2multipleField
  *
- * @property Model $model
+ * @property Model  $model
+ * @property string $scenario
  */
 class ModelValidator extends Validator
 {
     public $model;
+    public $scenario = Model::SCENARIO_DEFAULT;
 
     /**
      * {@inheritdoc}
@@ -33,6 +35,10 @@ class ModelValidator extends Validator
 
         if (!$this->model && !($this->model instanceof Model)) {
             throw new InvalidConfigException('"model" parameter required!');
+        }
+
+        if (empty($this->scenario)) {
+            throw new InvalidConfigException('"scenario" parameter required!');
         }
     }
 
@@ -53,9 +59,12 @@ class ModelValidator extends Validator
 
         if ($value instanceof $this->model) {
             $object = $value;
+            $object->scenario = $this->scenario;
         }
         else {
+            /** @var Model $object */
             $object = Yii::createObject(['class' => $this->model]);
+            $object->scenario = $this->scenario;
 
             if (!$object->load($value, '')) {
                 $this->addError($model, $attribute, $this->message);
@@ -93,9 +102,12 @@ class ModelValidator extends Validator
 
         if ($value instanceof $this->model) {
             $object = $value;
+            $object->scenario = $this->scenario;
         }
         else {
+            /** @var Model $object */
             $object = Yii::createObject(['class' => $this->model]);
+            $object->scenario = $this->scenario;
 
             if (!$object->load($value, '')) {
                 return [$this->message, []];

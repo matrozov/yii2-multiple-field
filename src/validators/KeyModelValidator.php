@@ -12,10 +12,12 @@ use yii\helpers\Html;
  * @package matrozov\yii2multipleField
  *
  * @property Model $model
+ * @property string $scenario
  */
 class KeyModelValidator extends KeyValidator
 {
     public $model;
+    public $scenario = Model::SCENARIO_DEFAULT;
 
     /**
      * {@inheritdoc}
@@ -26,6 +28,10 @@ class KeyModelValidator extends KeyValidator
 
         if (!$this->model && !($this->model instanceof Model)) {
             throw new InvalidConfigException('"model" parameter required!');
+        }
+
+        if (empty($this->scenario)) {
+            throw new InvalidConfigException('"scenario" parameter required!');
         }
     }
 
@@ -46,11 +52,19 @@ class KeyModelValidator extends KeyValidator
         $values = $model->$attribute;
 
         foreach ($values as $key => $value) {
-            $object = Yii::createObject(['class' => $this->model]);
+            if ($value instanceof $this->model) {
+                $object = $value;
+                $object->scenario = $this->scenario;
+            }
+            else {
+                /** @var Model $object */
+                $object = Yii::createObject(['class' => $this->model]);
+                $object->scenario = $this->scenario;
 
-            if (!$object->load($value, '')) {
-                $this->addError($model, $attribute, $this->message);
-                return;
+                if (!$object->load($value, '')) {
+                    $this->addError($model, $attribute, $this->message);
+                    return;
+                }
             }
 
             if (!$object->validate() && $object->hasErrors()) {
@@ -85,7 +99,8 @@ class KeyModelValidator extends KeyValidator
         }
 
         $validator = new ModelValidator([
-            'model' => $this->model,
+            'model'    => $this->model,
+            'scenario' => $this->scenario,
         ]);
 
         foreach ($values as $key => $value) {

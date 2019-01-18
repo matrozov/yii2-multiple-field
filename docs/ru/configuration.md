@@ -6,6 +6,13 @@
 
 ```php
 $form->field($myModel, 'my-field')->widget(MultipleField::class, [
+    'options' => [
+        'tag' => 'div',
+    ],
+    'itemOptions' => [
+        'tag' => 'div',
+        'class' => 'my-item',
+    ],
     'item' => '_item',
     'max' => 10,
     'maxReachedMessage' => 'Item limit :(',
@@ -14,6 +21,8 @@ $form->field($myModel, 'my-field')->widget(MultipleField::class, [
 
 Теперь по порядку, по полям:
 
+* **options** - Свойства виджета MultipleForm.
+* **itemOptions** - Свойства блока.
 * **item** - Название шаблона или callback-функция, производящая рендер блока.
 * **max** - Максимальное количество блоков (по умолчанию = null, без лимита).
 * **maxReachedMessage** - Сообщение, выводимое при помощи функции js Alert при достижении лимита блоков, если была
