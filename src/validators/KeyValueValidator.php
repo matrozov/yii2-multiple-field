@@ -2,7 +2,7 @@
 
 namespace matrozov\yii2multipleField\validators;
 
-use yii\base\DynamicModel;
+use matrozov\yii2multipleField\extend\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;

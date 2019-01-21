@@ -71,24 +71,6 @@
                 self.options  = $.extend(true, {}, self.defaultOptions, options || {});
                 self.$wrapper = $('#' + self.options.id);
 
-                self.$wrapper.on('click', '.js-item-add', function(event) {
-                    event.stopPropagation();
-
-                    self.add();
-
-                    return false;
-                });
-
-                self.$wrapper.on('click', '.js-item-remove', function(event) {
-                    event.stopPropagation();
-
-                    var $item = $(this).closest('.multiple-field-item');
-
-                    self.remove($item);
-
-                    return false;
-                });
-
                 self.$wrapper.data('multipleField', self);
 
                 var afterInitEvent = $.Event(self.events.afterInit);
