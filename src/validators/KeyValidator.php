@@ -2,6 +2,7 @@
 
 namespace matrozov\yii2multipleField\validators;
 
+use matrozov\yii2multipleField\traits\ValueValidatorTrait;
 use Yii;
 use matrozov\yii2multipleField\extend\DynamicModel;
 use yii\base\InvalidConfigException;
@@ -18,6 +19,8 @@ use yii\validators\Validator;
  */
 abstract class KeyValidator extends Validator
 {
+    use ValueValidatorTrait;
+
     public $keyRules     = [];
     public $keyIsIndexed = false;
 
@@ -37,25 +40,6 @@ abstract class KeyValidator extends Validator
         if (!$this->keyRules && !is_array($this->keyRules)) {
             throw new InvalidConfigException('"keyRules" parameter required!');
         }
-    }
-
-    /**
-     * @return array
-     */
-    protected function prepareKeyRules()
-    {
-        $rules = [];
-
-        foreach ($this->keyRules as $rule) {
-            if ($rule instanceof Validator) {
-                $rules[] = $rule;
-            }
-            elseif (is_array($rule) && isset($rule[0])) {
-                $rules[] = ArrayHelper::merge(['key'], $rule);
-            }
-        }
-
-        return $rules;
     }
 
     /**
@@ -80,12 +64,12 @@ abstract class KeyValidator extends Validator
 
         $filtered = [];
 
-        $rules = $this->prepareKeyRules();
-
         foreach ($values as $key => $value) {
-            $object = DynamicModel::validateData(['key' => $key], $rules);
+            $object = new DynamicModel(['key' => $key]);
 
-            if ($object->hasErrors()) {
+            static::prepareValueRules($this->keyRules, $object, $model, 'key', $key, $value);
+
+            if (!$object->validate()) {
                 $error = $object->getFirstError('key');
 
                 $model->addError($attribute . '[' . $key . ']', $error);
@@ -113,12 +97,12 @@ abstract class KeyValidator extends Validator
             return [$this->message, []];
         }
 
-        $rules = $this->prepareKeyRules();
+        foreach ($values as $key => $value) {
+            $object = new DynamicModel(['key' => $key]);
 
-        foreach ($values as $key => $data) {
-            $object = DynamicModel::validateData(['key' => $key], $rules);
+            static::prepareValueRules($this->keyRules, $object, new Model(), 'key', $key, $value);
 
-            if ($object->hasErrors()) {
+            if (!$object->validate()) {
                 $error = $object->getFirstError('key');
 
                 return [$error, []];

@@ -3,9 +3,11 @@
 namespace matrozov\yii2multipleField\validators;
 
 use matrozov\yii2multipleField\extend\DynamicModel;
+use matrozov\yii2multipleField\traits\ModelValidatorTrait;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
+use yii\validators\Validator;
 
 /**
  * Class KeyArrayValidator
@@ -15,6 +17,8 @@ use yii\helpers\Html;
  */
 class KeyArrayValidator extends KeyValidator
 {
+    use ModelValidatorTrait;
+
     public $rules;
 
     /**
@@ -46,9 +50,11 @@ class KeyArrayValidator extends KeyValidator
         $values = $model->$attribute;
 
         foreach ($values as $key => $value) {
-            $object = DynamicModel::validateData($value, $this->rules);
+            $object = new DynamicModel($value);
 
-            if ($object->hasErrors()) {
+            static::prepareModelRules($this->rules, $object, $model, $key, $value);
+
+            if (!$object->validate()) {
                 $errors = $object->getFirstErrors();
 
                 foreach ($errors as $field => $error) {

@@ -29,25 +29,6 @@ class KeyValueValidator extends KeyValidator
     }
 
     /**
-     * @return array
-     */
-    protected function prepareRules()
-    {
-        $rules = [];
-
-        foreach ($this->rules as $rule) {
-            if ($rule instanceof Validator) {
-                $rules[] = $rule;
-            }
-            elseif (is_array($rule) && isset($rule[0])) {
-                $rules[] = ArrayHelper::merge(['value'], $rule);
-            }
-        }
-
-        return $rules;
-    }
-
-    /**
      * @param Model  $model
      * @param string $attribute
      *
@@ -64,12 +45,12 @@ class KeyValueValidator extends KeyValidator
 
         $filtered = [];
 
-        $rules = $this->prepareRules();
-
         foreach ($values as $key => $value) {
-            $object = DynamicModel::validateData(['value' => $value], $rules);
+            $object = new DynamicModel(['value' => $value]);
 
-            if ($object->hasErrors()) {
+            static::prepareValueRules($this->rules, $object, $model, 'value', $key, $value);
+
+            if (!$object->validate()) {
                 $error = $object->getFirstError('value');
 
                 $model->addError($attribute . '[' . $key . ']', $error);
@@ -91,12 +72,12 @@ class KeyValueValidator extends KeyValidator
             return $error;
         }
 
-        $rules = $this->prepareRules();
-
         foreach ($values as $key => $value) {
-            $object = DynamicModel::validateData(['value' => $value], $rules);
+            $object = new DynamicModel(['value' => $value]);
 
-            if ($object->hasErrors()) {
+            static::prepareValueRules($this->rules, $object, new Model(), 'value', $key, $value);
+
+            if (!$object->validate()) {
                 $error = $object->getFirstError('value');
 
                 return [$error, []];
