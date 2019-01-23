@@ -82,8 +82,10 @@ class KeyModelValidator extends KeyValidator
                 continue;
             }
 
-            $model->$attribute[$key] = $object;
+            $values[$key] = $object;
         }
+
+        $model->$attribute = $values;
     }
 
     /**

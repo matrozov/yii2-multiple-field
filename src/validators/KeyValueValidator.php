@@ -43,8 +43,6 @@ class KeyValueValidator extends KeyValidator
             return;
         }
 
-        $filtered = [];
-
         foreach ($values as $key => $value) {
             $object = new DynamicModel(['value' => $value]);
 
@@ -56,8 +54,10 @@ class KeyValueValidator extends KeyValidator
                 $model->addError($attribute . '[' . $key . ']', $error);
             }
 
-            $filtered[$key] = $object['value'];
+            $values[$key] = $object['value'];
         }
+
+        $model->$attribute = $values;
     }
 
     /**
