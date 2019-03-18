@@ -38,8 +38,6 @@ class DynamicModel extends \yii\base\DynamicModel
      */
     public function __isset($name)
     {
-        $this->defineAttribute($name, null);
-
         return true;
     }
 }
