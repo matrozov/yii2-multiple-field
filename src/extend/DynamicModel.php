@@ -13,11 +13,11 @@ class DynamicModel extends \yii\base\DynamicModel
      */
     public function __get($name)
     {
-        if (parent::__isset($name)) {
-            return parent::__get($name);
+        if (!parent::__isset($name)) {
+            $this->defineAttribute($name, null);
         }
 
-        return null;
+        return parent::__get($name);
     }
 
     /**
@@ -25,6 +25,8 @@ class DynamicModel extends \yii\base\DynamicModel
      */
     public function __isset($name)
     {
+        $this->defineAttribute($name, null);
+
         return true;
     }
 }
