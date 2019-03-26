@@ -36,6 +36,12 @@ class KeyValueValidator extends KeyValidator
      */
     public function validateAttribute($model, $attribute)
     {
+        parent::validateAttribute($model, $attribute);
+
+        if ($model->hasErrors($attribute)) {
+            return;
+        }
+
         $values = $model->$attribute;
 
         if (!is_array($values) && !($values instanceof \ArrayAccess)) {
