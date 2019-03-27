@@ -51,15 +51,22 @@ class KeyModelValidator extends KeyValidator
 
         $values = $model->$attribute;
 
+        if (is_callable($this->scenario)) {
+            $scenario = call_user_func($this->scenario, $model);
+        }
+        else {
+            $scenario = $this->scenario;
+        }
+
         foreach ($values as $key => $value) {
             if ($value instanceof $this->model) {
                 $object = $value;
-                $object->scenario = $this->scenario;
+                $object->scenario = $scenario;
             }
             else {
                 /** @var Model $object */
                 $object = Yii::createObject(['class' => $this->model]);
-                $object->scenario = $this->scenario;
+                $object->scenario = $scenario;
 
                 if (!$object->load($value, '')) {
                     $this->addError($model, $attribute, $this->message);

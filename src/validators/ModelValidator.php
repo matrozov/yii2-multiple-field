@@ -57,14 +57,21 @@ class ModelValidator extends Validator
             return;
         }
 
+        if (is_callable($this->scenario)) {
+            $scenario = call_user_func($this->scenario, $model);
+        }
+        else {
+            $scenario = $this->scenario;
+        }
+
         if ($value instanceof $this->model) {
             $object = $value;
-            $object->scenario = $this->scenario;
+            $object->scenario = $scenario;
         }
         else {
             /** @var Model $object */
             $object = Yii::createObject(['class' => $this->model]);
-            $object->scenario = $this->scenario;
+            $object->scenario = $scenario;
 
             if (!$object->load($value, '')) {
                 $this->addError($model, $attribute, $this->message);
