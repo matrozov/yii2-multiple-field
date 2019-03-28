@@ -14,11 +14,13 @@ use yii\validators\Validator;
  *
  * @property Model  $model
  * @property string $scenario
+ * @property bool   $strictClass
  */
 class ModelValidator extends Validator
 {
     public $model;
-    public $scenario = Model::SCENARIO_DEFAULT;
+    public $scenario    = Model::SCENARIO_DEFAULT;
+    public $strictClass = false;
 
     /**
      * {@inheritdoc}
@@ -64,7 +66,9 @@ class ModelValidator extends Validator
             $scenario = $this->scenario;
         }
 
-        if ($value instanceof $this->model) {
+        if ((!$this->strictClass && ($value instanceof $this->model))
+            || ($this->strictClass && (get_class($value) == $this->model))
+        ) {
             $object = $value;
             $object->scenario = $scenario;
         }
@@ -107,7 +111,9 @@ class ModelValidator extends Validator
             return [$this->message, []];
         }
 
-        if ($value instanceof $this->model) {
+        if ((!$this->strictClass && ($value instanceof $this->model))
+            || ($this->strictClass && (get_class($value) == $this->model))
+        ) {
             $object = $value;
             $object->scenario = $this->scenario;
         }

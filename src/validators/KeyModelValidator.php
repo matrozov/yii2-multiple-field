@@ -13,11 +13,13 @@ use yii\helpers\Html;
  *
  * @property Model $model
  * @property string $scenario
+ * @property bool   $strictClass
  */
 class KeyModelValidator extends KeyValidator
 {
     public $model;
-    public $scenario = Model::SCENARIO_DEFAULT;
+    public $scenario    = Model::SCENARIO_DEFAULT;
+    public $strictClass = false;
 
     /**
      * {@inheritdoc}
@@ -59,7 +61,9 @@ class KeyModelValidator extends KeyValidator
         }
 
         foreach ($values as $key => $value) {
-            if ($value instanceof $this->model) {
+            if ((!$this->strictClass && ($value instanceof $this->model))
+                || ($this->strictClass && (get_class($value) == $this->model))
+            ) {
                 $object = $value;
                 $object->scenario = $scenario;
             }
