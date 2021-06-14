@@ -73,7 +73,7 @@ class ModelValidator extends Validator
         } else {
             if (is_callable($this->model)) {
                 /** @var Model $object */
-                $object = call_user_func($this->model, $this);
+                $object = call_user_func($this->model, $model);
             } else {
                 /** @var Model $object */
                 $object = Yii::createObject(['class' => $this->model]);
@@ -123,7 +123,7 @@ class ModelValidator extends Validator
         } else {
             if (is_callable($this->model)) {
                 /** @var Model $object */
-                $object = call_user_func($this->model, $this);
+                $object = call_user_func($this->model);
             } else {
                 /** @var Model $object */
                 $object = Yii::createObject(['class' => $this->model]);
