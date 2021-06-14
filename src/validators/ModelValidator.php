@@ -12,9 +12,9 @@ use yii\validators\Validator;
  * Class ModelValidator
  * @package matrozov\yii2multipleField
  *
- * @property Model  $model
- * @property string $scenario
- * @property bool   $strictClass
+ * @property Model|Callable $model
+ * @property string         $scenario
+ * @property bool           $strictClass
  */
 class ModelValidator extends Validator
 {
@@ -35,7 +35,7 @@ class ModelValidator extends Validator
             $this->message = Yii::t('yii', '{attribute} is invalid.');
         }
 
-        if (!$this->model && !($this->model instanceof Model)) {
+        if (!$this->model && !(($this->model instanceof Model) || is_callable($this->model))) {
             throw new InvalidConfigException('"model" parameter required!');
         }
 
@@ -61,8 +61,7 @@ class ModelValidator extends Validator
 
         if (is_callable($this->scenario)) {
             $scenario = call_user_func($this->scenario, $model);
-        }
-        else {
+        } else {
             $scenario = $this->scenario;
         }
 
@@ -71,10 +70,15 @@ class ModelValidator extends Validator
         ) {
             $object = $value;
             $object->scenario = $scenario;
-        }
-        else {
-            /** @var Model $object */
-            $object = Yii::createObject(['class' => $this->model]);
+        } else {
+            if (is_callable($this->model)) {
+                /** @var Model $object */
+                $object = call_user_func($this->model, $this);
+            } else {
+                /** @var Model $object */
+                $object = Yii::createObject(['class' => $this->model]);
+            }
+
             $object->scenario = $scenario;
 
             if (!$object->load($value, '')) {
@@ -116,10 +120,15 @@ class ModelValidator extends Validator
         ) {
             $object = $value;
             $object->scenario = $this->scenario;
-        }
-        else {
-            /** @var Model $object */
-            $object = Yii::createObject(['class' => $this->model]);
+        } else {
+            if (is_callable($this->model)) {
+                /** @var Model $object */
+                $object = call_user_func($this->model, $this);
+            } else {
+                /** @var Model $object */
+                $object = Yii::createObject(['class' => $this->model]);
+            }
+
             $object->scenario = $this->scenario;
 
             if (!$object->load($value, '')) {

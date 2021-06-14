@@ -4,15 +4,17 @@ namespace matrozov\yii2multipleField;
 
 use matrozov\yii2multipleField\extend\ActiveField;
 use Yii;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\InputWidget;
 
 /**
  * Class MultipleField
  * @package matrozov\yii2multipleField
  *
- * @property \yii\base\Model $model
+ * @property Model           $model
  * @property string          $attribute
  *
  * @property array           $options;
@@ -22,7 +24,7 @@ use yii\helpers\Json;
  * @property int|null        $max
  * @property string          $maxReachedMessage
  */
-class MultipleField extends \yii\widgets\InputWidget
+class MultipleField extends InputWidget
 {
     public $itemOptions = [];
 
