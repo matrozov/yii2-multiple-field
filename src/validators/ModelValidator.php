@@ -12,9 +12,9 @@ use yii\validators\Validator;
  * Class ModelValidator
  * @package matrozov\yii2multipleField
  *
- * @property Model|Callable $model
- * @property string         $scenario
- * @property bool           $strictClass
+ * @property Model|Callable  $model
+ * @property string|Callable $scenario
+ * @property bool            $strictClass
  */
 class ModelValidator extends Validator
 {
@@ -115,11 +115,17 @@ class ModelValidator extends Validator
             return [$this->message, []];
         }
 
+        if (is_callable($this->scenario)) {
+            $scenario = call_user_func($this->scenario, $model);
+        } else {
+            $scenario = $this->scenario;
+        }
+
         if ((!$this->strictClass && ($value instanceof $this->model))
             || ($this->strictClass && (get_class($value) == $this->model))
         ) {
             $object = $value;
-            $object->scenario = $this->scenario;
+            $object->scenario = $scenario;
         } else {
             if (is_callable($this->model)) {
                 /** @var Model $object */
@@ -129,7 +135,7 @@ class ModelValidator extends Validator
                 $object = Yii::createObject(['class' => $this->model]);
             }
 
-            $object->scenario = $this->scenario;
+            $object->scenario = $scenario;
 
             if (!$object->load($value, '')) {
                 return [$this->message, []];
