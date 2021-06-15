@@ -11,9 +11,9 @@ use yii\helpers\Html;
  * Class KeyModelValidator
  * @package matrozov\yii2multipleField
  *
- * @property Model $model
- * @property string $scenario
- * @property bool   $strictClass
+ * @property Model|Callable  $model
+ * @property string|Callable $scenario
+ * @property bool            $strictClass
  */
 class KeyModelValidator extends KeyValidator
 {
@@ -28,7 +28,7 @@ class KeyModelValidator extends KeyValidator
     {
         parent::init();
 
-        if (!$this->model && !($this->model instanceof Model)) {
+        if (!$this->model && !(($this->model instanceof Model) || is_callable($this->model))) {
             throw new InvalidConfigException('"model" parameter required!');
         }
 
@@ -55,8 +55,7 @@ class KeyModelValidator extends KeyValidator
 
         if (is_callable($this->scenario)) {
             $scenario = call_user_func($this->scenario, $model);
-        }
-        else {
+        } else {
             $scenario = $this->scenario;
         }
 
@@ -66,10 +65,15 @@ class KeyModelValidator extends KeyValidator
             ) {
                 $object = $value;
                 $object->scenario = $scenario;
-            }
-            else {
-                /** @var Model $object */
-                $object = Yii::createObject(['class' => $this->model]);
+            } else {
+                if (is_callable($this->model)) {
+                    /** @var Model $object */
+                    $object = call_user_func($this->model, $model);
+                } else {
+                    /** @var Model $object */
+                    $object = Yii::createObject(['class' => $this->model]);
+                }
+
                 $object->scenario = $scenario;
 
                 if (!$object->load($value, '')) {
