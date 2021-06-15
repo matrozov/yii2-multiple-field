@@ -116,7 +116,7 @@ class ModelValidator extends Validator
         }
 
         if (is_callable($this->scenario)) {
-            $scenario = call_user_func($this->scenario, $model);
+            $scenario = call_user_func($this->scenario);
         } else {
             $scenario = $this->scenario;
         }
