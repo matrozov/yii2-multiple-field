@@ -30,5 +30,10 @@
         "psr-4": {
             "matrozov\\yii2multipleField\\": "src"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
     }
 }

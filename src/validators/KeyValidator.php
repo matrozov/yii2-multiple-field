@@ -17,7 +17,7 @@ use yii\validators\Validator;
  * @property array $keyRules
  * @property bool  $keyIsIndexed
  */
-abstract class KeyValidator extends Validator
+class KeyValidator extends Validator
 {
     use ValueValidatorTrait;
 
