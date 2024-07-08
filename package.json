@@ -22,7 +22,7 @@
     },
     "homepage": "https://github.com/matrozov/yii2-multiple-field",
     "devDependencies": {
-        "gulp": "^4.0.2",
+        "gulp": "^5.0.0",
         "gulp-concat": "^2.4.1",
         "gulp-rename": "^1.2.0",
         "gulp-uglify": "^3.0.2"
