@@ -2,7 +2,7 @@
 
 namespace matrozov\yii2multipleField\traits;
 
-use matrozov\yii2multipleField\extend\DynamicModel;
+use matrozov\yii2multipleField\models\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\validators\InlineValidator;
@@ -31,8 +31,7 @@ trait ValueValidatorTrait
         foreach ($rules as $rule) {
             if ($rule instanceof Validator) {
                 $validators->append($rule);
-            }
-            elseif (is_array($rule) && isset($rule[0])) {
+            } elseif (is_array($rule) && isset($rule[0])) {
                 $params = array_slice($rule, 1);
 
                 $validator = Validator::createValidator($rule[0], $model, $attributes, $params);
@@ -50,8 +49,7 @@ trait ValueValidatorTrait
                 }
 
                 $validators->append($validator);
-            }
-            else {
+            } else {
                 throw new InvalidConfigException('Invalid validation rule: a rule must be an array specifying validator type.');
             }
         }

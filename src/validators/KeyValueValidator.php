@@ -2,11 +2,9 @@
 
 namespace matrozov\yii2multipleField\validators;
 
-use matrozov\yii2multipleField\extend\DynamicModel;
+use matrozov\yii2multipleField\models\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
-use yii\validators\Validator;
 
 /**
  * Class KeyValueValidator

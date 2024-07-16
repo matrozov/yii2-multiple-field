@@ -4,8 +4,12 @@
 
 Интеграция виджета происходит следующим образом:
 
-```php
-$form->field($myModel, 'my-field')->widget(MultipleField::class, [
+```html
+<?php $form = ActiveForm::begin([
+    'fieldClass' => ActiveField::class, // Обязательно переопределение класса поля, так как стандартный класс не умеет работать с ошибками во вложенных сущностях 
+]) ?>
+
+<?= $form->field($myModel, 'my_field', ['options' => ['id' => 'myMyltipleField']])->widget(MultipleField::class, [
     'options' => [
         'tag' => 'div',
     ],
@@ -14,9 +18,9 @@ $form->field($myModel, 'my-field')->widget(MultipleField::class, [
         'class' => 'my-item',
     ],
     'item' => '_item',
-    'max' => 10,
-    'maxReachedMessage' => 'Item limit :(',
-]);
+]) ?>
+
+<?php ActiveForm::end() ?>
 ```
 
 Теперь по порядку, по полям:
@@ -24,9 +28,6 @@ $form->field($myModel, 'my-field')->widget(MultipleField::class, [
 * **options** - Свойства виджета MultipleForm.
 * **itemOptions** - Свойства блока.
 * **item** - Название шаблона или callback-функция, производящая рендер блока.
-* **max** - Максимальное количество блоков (по умолчанию = null, без лимита).
-* **maxReachedMessage** - Сообщение, выводимое при помощи функции js Alert при достижении лимита блоков, если была
-вызвана функция добавления нового блока.
 
 ### Шаблон блока
 
@@ -38,7 +39,7 @@ $form->field($myModel, 'my-field')->widget(MultipleField::class, [
 Вставка полей ввода в блоках происходит не от формы, а от самого блока но, почти, в том же самом синтаксисе:
 
 ```php
-$block->field('my-sub-field')->textInput();
+$block->field('my_sub_field')->textInput();
 ```
 
 Отличием является то, что метод field() блока не требует указания исходной модели данных, так как она уже была ранее указана для самого
@@ -53,14 +54,19 @@ MultipleField. Так же стоит отметить, что поле my-sub-f
 MultipleField предоставляет следующие методы управления блоками полей ввода.
 
 * **add**() - Добавляет новый пустой блок.
-* **remove**(index) - Удаляет указанный по счету блок.
+* **remove**(indexOrElement) - Удаляет указанный блок по его номеру или html-элементу в нём.
 * **count**() - Возвращает текущее количество блоков.
+* **index**(element) - Возвращает индекс текущего блока по html-элементу.
 * **option**(name, [value]) - Чтение или запись параметра виджета.
 
 Для вызова метода достаточно обратиться к объекту multipleField по его id:
 
 ```javascript
-$("#myMyltipleField").multipleField('remove', 4);
+$('#myMyltipleField').multipleField('remove', 4);
+```
+
+```html
+<button onclick="$('#myMyltipleField').multipleField('remove', this)">Delete</button>
 ```
 
 ### События
@@ -72,6 +78,19 @@ $("#myMyltipleField").multipleField('remove', 4);
 * **beforeRemove** - Событие, предшествующее удалению блока. Если обработчик события вернет false, то удаление блока
 произведено не будет.
 * **afterRemove** - Событие, вызываемое после удаления блока.
-* **maxReached** - Событие, происходящее при попытке добавления блока сверх лимита. Если обработчик события вернет false,
-то стандартное сообщение по средством метода Alert вызвано не будет. Данное поведение используется для переопределения
-отображения сообщения об ошибки достижения лимита.
+
+## Валидация на стороне бекенда
+
+```php
+
+public function rules(): array
+{
+    return [
+        [['my_field'], 'required'],
+        [['my_field'], KeyArrayValidator::class, [
+            [['my_sub_field'], 'string', 'max' => 255],        
+        ]],
+    ];
+}
+
+```

@@ -4,7 +4,7 @@ var gulp   = require('gulp'),
     rename = require('gulp-rename');
 
 gulp.task('default', function () {
-    var path = './src/asset/js/';
+    var path = './src/web/js/';
 
     return gulp.src([
         path + 'jquery.multipleField.js'
