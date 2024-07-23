@@ -18,6 +18,9 @@
         'class' => 'my-item',
     ],
     'item' => '_item',
+    'params' => [
+        'myCustomParam' => 'myCustomParamValue',
+    ],
 ]) ?>
 
 <?php ActiveForm::end() ?>
@@ -28,6 +31,7 @@
 * **options** - Свойства виджета MultipleForm.
 * **itemOptions** - Свойства блока.
 * **item** - Название шаблона или callback-функция, производящая рендер блока.
+* **params** - Дополнительные параметры, передаваемые в шаблон.
 
 ### Шаблон блока
 

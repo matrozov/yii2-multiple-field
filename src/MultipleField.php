@@ -17,10 +17,11 @@ use yii\widgets\InputWidget;
  * @property Model           $model
  * @property string          $attribute
  *
- * @property array           $options;
- * @property array           $itemOptions;
-
+ * @property array           $options
+ * @property array           $itemOptions
+ *
  * @property string|callable $item
+ * @property array           $params
  * @property int|null        $max
  * @property string          $maxReachedMessage
  */
@@ -29,6 +30,7 @@ class MultipleField extends InputWidget
     public $itemOptions = [];
 
     public $item;
+    public $params = [];
     public $max;
     public $maxReachedMessage;
 
@@ -111,10 +113,10 @@ class MultipleField extends InputWidget
             $result = call_user_func_array($this->item, [$this, $key, &$options]);
         }
         else {
-            $result = $this->view->render($this->item, [
+            $result = $this->view->render($this->item, array_merge([
                 'block' => $this,
                 'key'   => $key,
-            ]);
+            ], $this->params));
         }
 
         $tag = ArrayHelper::remove($options, 'tag', 'div');
