@@ -17,16 +17,18 @@ use yii\widgets\InputWidget;
  * @property Model           $model
  * @property string          $attribute
  *
- * @property array           $options;
- * @property array           $itemOptions;
+ * @property array           $options
+ * @property array           $itemOptions
 
  * @property string|callable $item
+ * @property array           $params
  */
 class MultipleField extends InputWidget
 {
     public $itemOptions = [];
 
     public $item;
+    public $params = [];
 
     /** @var int $_key */
     protected $_key;
@@ -90,11 +92,12 @@ class MultipleField extends InputWidget
 
         if (is_callable($this->item)) {
             $result = call_user_func_array($this->item, [$this, $key, &$options]);
-        } else {
-            $result = $this->view->render($this->item, [
+        }
+        else {
+            $result = $this->view->render($this->item, array_merge([
                 'block' => $this,
                 'key'   => $key,
-            ]);
+            ], $this->params));
         }
 
         $tag = ArrayHelper::remove($options, 'tag', 'div');
