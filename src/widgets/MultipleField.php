@@ -3,7 +3,6 @@
 namespace matrozov\yii2multipleField\widgets;
 
 use matrozov\yii2multipleField\assets\MultipleFieldAsset;
-use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -48,9 +47,9 @@ class MultipleField extends InputWidget
         $result = $this->renderItems($this->options);
 
         $options = [
-            'id'                => $id,
-            'template'          => $template,
-            'nextKey'           => $this->_key++,
+            'id'       => $id,
+            'template' => $template,
+            'nextKey'  => $this->_key++,
         ];
 
         $this->view->registerJs('$(\'#' . $id . '\').multipleField(' . Json::encode($options) . ');');
@@ -71,7 +70,7 @@ class MultipleField extends InputWidget
         $keys   = $values ? array_keys($values) : [1];
 
         foreach ($keys as $key) {
-            $result .= $this->renderItem($key, $this->itemOptions);
+            $result .= $this->renderItem($key, $this->itemOptions, false);
         }
 
         $tag = ArrayHelper::remove($options, 'tag', 'div');
@@ -86,7 +85,7 @@ class MultipleField extends InputWidget
      *
      * @return string
      */
-    protected function renderItem($key, $options)
+    protected function renderItem($key, $options, $isTemplate)
     {
         $this->_key = $key;
 
@@ -95,8 +94,9 @@ class MultipleField extends InputWidget
         }
         else {
             $result = $this->view->render($this->item, array_merge([
-                'block' => $this,
-                'key'   => $key,
+                'block'      => $this,
+                'key'        => $key,
+                'isTemplate' => $isTemplate,
             ], $this->params));
         }
 
@@ -106,11 +106,14 @@ class MultipleField extends InputWidget
         return Html::tag($tag, $result, $options);
     }
 
+    /**
+     * @return false|string[]
+     */
     protected function renderTemplate()
     {
         $templateKey = uniqid();
 
-        return explode($templateKey, $this->renderItem($templateKey, $this->itemOptions));
+        return explode($templateKey, $this->renderItem($templateKey, $this->itemOptions, true));
     }
 
     /**
