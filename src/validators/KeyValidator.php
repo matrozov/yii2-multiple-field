@@ -8,21 +8,38 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
-use yii\validators\Validator;
 
 /**
  * Class KeyValidator
- * @package matrozov\yii2multipleField
+ * @package matrozov\yii2multipleField\validators
  *
- * @property array $keyRules
- * @property bool  $keyIsIndexed
+ * @property array  $keyRules
+ *
+ * @property bool   $keyIsIndexed
+ * @property string $messageKeyIsIndexed
+ *
+ * @property integer|null $min
+ * @property string       $messageMin
+ *
+ * @property integer|null $max
+ * @property string       $messageMax
  */
 class KeyValidator extends Validator
 {
     use ValueValidatorTrait;
 
-    public $keyRules     = [];
+    public $keyRules = [];
+
+    public $messageArray = null;
+
     public $keyIsIndexed = false;
+    public $messageKeyIsIndexed = null;
+
+    public $min = null;
+    public $messageMin = null;
+
+    public $max = null;
+    public $messageMax = null;
 
     /**
      * {@inheritdoc}
@@ -35,6 +52,22 @@ class KeyValidator extends Validator
 
         if ($this->message === null) {
             $this->message = Yii::t('yii', '{attribute} is invalid.');
+        }
+
+        if ($this->messageArray === null) {
+            $this->messageArray = Yii::t('yii', '{attribute} must be an array.');
+        }
+
+        if ($this->messageKeyIsIndexed === null) {
+            $this->messageKeyIsIndexed = Yii::t('yii', '{attribute} must be indexed.');
+        }
+
+        if ($this->messageMin === null) {
+            $this->messageMin = Yii::t('yii', '{attribute} must contain at least {min} element.');
+        }
+
+        if ($this->messageMax === null) {
+            $this->messageMax = Yii::t('yii', '{attribute} must contain at most {max} element.');
         }
 
         if (!$this->keyRules && !is_array($this->keyRules)) {
@@ -53,13 +86,25 @@ class KeyValidator extends Validator
         $values = $model->$attribute;
 
         if (!is_array($values) && !($values instanceof \ArrayAccess)) {
-            $this->addError($model, $attribute, $this->message);
+            $this->addError($model, $attribute, $this->messageArray);
             return;
         }
 
         if ($this->keyIsIndexed && !ArrayHelper::isIndexed($values)) {
-            $this->addError($model, $attribute, $this->message);
+            $this->addError($model, $attribute, $this->messageKeyIsIndexed);
             return;
+        }
+
+        if (($this->min !== null) && (count($values) < $this->min)) {
+            $this->addError($model, $attribute, $this->messageMin, [
+                'min' => $this->min,
+            ]);
+        }
+
+        if (($this->max !== null) && (count($values) > $this->max)) {
+            $this->addError($model, $attribute, $this->messageMax, [
+                'max' => $this->max,
+            ]);
         }
 
         $filtered = [];
@@ -72,7 +117,7 @@ class KeyValidator extends Validator
             if (!$object->validate()) {
                 $error = $object->getFirstError('key');
 
-                $model->addError($attribute . '[' . $key . ']', $error);
+                $model->addError($this->formatErrorAttribute($attribute, [$key]), $error);
             }
 
             $filtered[$object['key']] = $value;

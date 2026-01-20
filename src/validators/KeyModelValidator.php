@@ -9,7 +9,7 @@ use yii\helpers\Html;
 
 /**
  * Class KeyModelValidator
- * @package matrozov\yii2multipleField
+ * @package matrozov\yii2multipleField\validators
  *
  * @property Model|Callable  $model
  * @property string|Callable $scenario
@@ -87,11 +87,11 @@ class KeyModelValidator extends KeyValidator
 
                 foreach ($errors as $field => $error) {
                     if (!preg_match(Html::$attributeRegex, $field, $matches)) {
-                        $model->addError($attribute . '[' . $key . '][' . $field . ']', $error);
+                        $model->addError($this->formatErrorAttribute($attribute, [$key, $field]), $error);
                         return;
                     }
 
-                    $model->addError($attribute . '[' . $key . '][' . $matches[2] . ']' . $matches[3], $error);
+                    $model->addError($this->formatErrorAttribute($attribute, [$key, $matches[2]], $matches[3]), $error);
                 }
 
                 continue;

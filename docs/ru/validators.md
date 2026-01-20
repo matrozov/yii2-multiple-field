@@ -1,21 +1,103 @@
-# Валидаторы
-
-* [ArrayValidator](validators.md#user-content-arrayvalidator)
-* [ModelValidator](validators.md#user-content-modelvalidator)
-* [KeyValidator](validators.md#user-content-keyvalidator)
-* [KeyValueValidator](validators.md#user-content-keyvaluevalidator)
-* [KeyArrayValidator](validators.md#user-content-keyarrayvalidator)
-* [KeyModelValidator](validators.md#user-content-keymodelvalidator)
+# Валидация
 
 ## Обработка ошибок
 
 Отличительной особенностью данного виджета является прозрачная и полнофункциональная система обработки и отображения
 ошибок полей формы. Используя встроенный набор валидаторов можно реализовать и вернуть на форму ошибки для конкретного
-поля в конкретном блоке. Т.е., например, если ошибу вызвало некое поле в третьем по счету блоке, то именно под ним и будет
+поля в конкретном блоке. Т.е., например, если ошибку вызвало некое поле в третьем по счету блоке, то именно под ним и будет
 выведена ошибка при возврате на форму. Список валидаторов избыточен и для реализации базовой валидации достаточно использовать два из
 них: [KeyArrayValidator](validators.md#user-content-keyarrayvalidator) и
 [KeyModelValidator](validators.md#user-content-keymodelvalidator). Отличием между ними является только формат описания
 правил валидации.
+
+---
+
+Базовый класс валидатора реализует механизм, позволяющий указать, какой формат ошибки будет использоваться при формировании имени поля,
+в котором произошла ошибка. Допустимы два варианта значения:
+
+**Validator::ERROR_FORMAT_URL** - формат используемый по умолчанию. Совместим с MultipleField для визуализации ошибок во View.
+Вложенные поля с ошибками формируются в виде элементов в квадратных скобках:
+```
+my_field[0][title]
+```
+**Validator::ERROR_FORMAT_DOT** - формат формирования поля, в котором используется точка "." в виде разделителя:
+```
+my_field.0.title
+```
+Обычно применяется для визуализации ошибок на уровне API.
+
+---
+
+Формат ошибки можно задать как глобально:
+```php
+Validator::$globalErrorFormat = Validator::ERROR_FORMAT_DOT;
+```
+или локально, на уровне любого валидатора, например:
+```php
+[['my-field'], ArrayValidator::class, 'rules' => [...], 'errorFormat' => Validator::ERROR_FORMAT_DOT],
+```
+
+## Валидаторы
+
+Решение предлагает несколько валидаторов в зависимости от того, что именно необходимо валидировать:
+
+### Валидация вложенной модели:
+
+```json
+{
+  "nested-model": {
+    "nested-field": "nested-field-model",
+    ...
+  }
+}
+```
+
+* [ArrayValidator](validators.md#user-content-arrayvalidator)
+* [ModelValidator](validators.md#user-content-modelvalidator)  
+
+### Валидация ключей вложенного массива
+
+```json
+{
+  "nested-array": [
+    "key1": ...,
+    "key2": ...,
+    ...
+  ]
+}
+```
+
+* [KeyValidator](validators.md#user-content-keyvalidator)
+
+### Валидация простых значений вложенного массива
+
+```json
+{
+  "nested-array": [
+    "value1",
+    "value2"
+  ]
+}
+```
+
+* [KeyValueValidator](validators.md#user-content-keyvaluevalidator)
+
+### Валидация вложенного массива моделей
+
+```json
+{
+  "nested-array-model": [
+    {
+      "nested-model-field": "nested-model-field-value",
+      ...
+    },
+    ...
+  ]
+}
+```
+
+* [KeyArrayValidator](validators.md#user-content-keyarrayvalidator)
+* [KeyModelValidator](validators.md#user-content-keymodelvalidator)
 
 ## ArrayValidator
 
@@ -90,12 +172,20 @@
 [['my-field'], KeyValidator::class, 'keyRules' => [
     ['integer', 'max' => 100],
     ...
-], 'keyIsIndexed' => true],
+], 'keyIsIndexed' => true, 'min' => 2, 'max' => 5],
 ```
 
 Правила валидации записываются аналогично виду стандартного
 [each](https://www.yiiframework.com/doc/api/2.0/yii-validators-eachvalidator)-валидатора с указанием только правил валидации.
-Параметр **keyIsIndexed** (по умолчанию = false) проверяет, являются ли переданные ключи последовательными числами начинающимися с 0.
+Дополнительные параметры позволяют более строго валидировать массив элементов:
+**keyIsIndexed** - (по умолчанию = false) проверяет, являются ли переданные ключи последовательными числами начинающимися с 0.
+**messageKeyIsIndexed** - задаёт текст сообщения ошибки в случае, если массив не является последовательным.
+**min** - указывает на минимальное количество элементов массива.
+**messageMin** - задаёт текст сообщения ошибки в случае, если элементов в массиме меньше указанного.
+**max** - указывает на максимальное количество элементов массива.
+**messageMax** - задаёт текст сообщения ошибки в случае, если элементов в массиме больше указанного.
+
+Все механики валидации ключей доступны и в наследуемых валидаторах: KeyValueValidator, KeyArrayValidator и KeyModelValidator
 
 ## KeyValueValidator
 

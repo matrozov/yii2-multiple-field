@@ -9,6 +9,8 @@ use yii\base\Model;
 /**
  * Class KeyValueValidator
  * @package matrozov\yii2multipleField\validators
+ *
+ * @property array $rules
  */
 class KeyValueValidator extends KeyValidator
 {
@@ -55,7 +57,7 @@ class KeyValueValidator extends KeyValidator
             if (!$object->validate()) {
                 $error = $object->getFirstError('value');
 
-                $model->addError($attribute . '[' . $key . ']', $error);
+                $model->addError($this->formatErrorAttribute($attribute, [$key]), $error);
             }
 
             $values[$key] = $object['value'];

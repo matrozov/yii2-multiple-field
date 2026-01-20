@@ -6,11 +6,10 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
-use yii\validators\Validator;
 
 /**
  * Class ModelValidator
- * @package matrozov\yii2multipleField
+ * @package matrozov\yii2multipleField\validators
  *
  * @property Model|Callable  $model
  * @property string|Callable $scenario
@@ -92,11 +91,11 @@ class ModelValidator extends Validator
 
             foreach ($errors as $field => $error) {
                 if (!preg_match(Html::$attributeRegex, $field, $matches)) {
-                    $model->addError($attribute . '[' . $field . ']', $error);
+                    $model->addError($this->formatErrorAttribute($attribute, [$field]), $error);
                     return;
                 }
 
-                $model->addError($attribute . '[' . $matches[2] . ']' . $matches[3], $error);
+                $model->addError($this->formatErrorAttribute($attribute, [$matches[2]], $matches[3]), $error);
             }
         }
 

@@ -9,6 +9,7 @@
         "yii2 array input",
         "yii2 array validate"
     ],
+    "abandoned": "matrozov/yii2-multiple-field-widget",
     "homepage": "https://github.com/matrozov/yii2-multiple-field",
     "type": "extension",
     "license": "MIT",

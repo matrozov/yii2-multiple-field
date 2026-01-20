@@ -10,7 +10,7 @@ use yii\helpers\Html;
 
 /**
  * Class KeyArrayValidator
- * @package matrozov\yii2multipleField
+ * @package matrozov\yii2multipleField\validators
  *
  * @property array $rules
  */
@@ -49,6 +49,11 @@ class KeyArrayValidator extends KeyValidator
         $values = $model->$attribute;
 
         foreach ($values as $key => $value) {
+            if (!is_array($value) && !($value instanceof \ArrayAccess)) {
+                $this->addError($model, $attribute, $this->messageArray);
+                continue;
+            }
+
             $object = new DynamicModel($value);
 
             static::prepareModelRules($this->rules, $object, $model, $key, $value);
@@ -58,11 +63,11 @@ class KeyArrayValidator extends KeyValidator
 
                 foreach ($errors as $field => $error) {
                     if (!preg_match(Html::$attributeRegex, $field, $matches)) {
-                        $model->addError($attribute . '[' . $key . '][' . $field . ']', $error);
+                        $model->addError($this->formatErrorAttribute($attribute, [$key, $field]), $error);
                         return;
                     }
 
-                    $model->addError($attribute . '[' . $key . '][' . $matches[2] . ']' . $matches[3], $error);
+                    $model->addError($this->formatErrorAttribute($attribute, [$key, $matches[2]], $matches[3]), $error);
                 }
 
                 continue;
