@@ -21,6 +21,7 @@ use yii\widgets\InputWidget;
 
  * @property string|callable $item
  * @property array           $params
+ * @property bool            $renderEmptyItem
  */
 class MultipleField extends InputWidget
 {
@@ -28,6 +29,15 @@ class MultipleField extends InputWidget
 
     public $item;
     public $params = [];
+
+    /**
+     * Выводить один пустой блок, если у атрибута нет значений.
+     * Отключайте, если список может быть пустым: иначе форма отправит пустой
+     * блок, и пользователю придётся удалить его перед сохранением.
+     *
+     * @var bool $renderEmptyItem
+     */
+    public $renderEmptyItem = true;
 
     /** @var int $_key */
     protected $_key;
@@ -67,7 +77,10 @@ class MultipleField extends InputWidget
         $result = '';
 
         $values = $this->model->{$this->attribute};
-        $keys   = $values ? array_keys($values) : [1];
+        $keys   = $values ? array_keys($values) : ($this->renderEmptyItem ? [1] : []);
+
+        // Без выведенных блоков в _key остался бы ключ шаблона (uniqid), а nextKey должен быть числом.
+        $this->_key = 0;
 
         foreach ($keys as $key) {
             $result .= $this->renderItem($key, $this->itemOptions, false);
